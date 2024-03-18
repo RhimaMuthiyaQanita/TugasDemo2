@@ -1,173 +1,292 @@
 package org.example;
 
 import java.util.Scanner;
-
-public class Main {
-    class BookList {
-        private static BookList[] BookList;
-    }
-
-    class userStudent {
-        private static userStudent[] userStudent;
-    }
-
-    public void menu() {
-        System.out.println("selamat datang di perpustakaan1");
-        System.out.println("silakan pilih:");
-        System.out.println("1. Login sebagai admin");
-        System.out.println("2. Login sebagai student");
-    }
-
-    public String inputNim() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Masukkan NIM Anda: ");
-        String nim = scanner.nextLine();
-        scanner.close();
-        return nim;
-    }
-
-    public void menuAdmin() {
-    }
-
-    private class Book {
-        private int id;
-        private String title;
-        private String author;
-        private int stock;
-
-        public Book(int id, String title, String author, int stock) {
-            this.id = id;
-            this.title = title;
-            this.author = author;
-            this.stock = stock;
-        }
-    }
-
-    private static void main(String[] args) {
-        Main main = new Main();
-        main.menu();
-        Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-
-        switch (choice) {
-            case 1:
-                main.menuAdmin();
-                break;
-            case 2:
-                String nim = main.inputNim();
-                if (main.checkNim()) {
-                    main.menuStudent();
-                } else {
-                    System.out.println("NIM tidak valid!");
-                }
-                break;
-            default:
-                System.out.println("Pilihan tidak valid");
-        }
-    }
-
-    private void menuStudent() {
-        return;
-    }
-
-    private boolean checkNim() {
-        return false;
-    }
-
-}    
-
 import java.util.ArrayList;
-import java.util.Scanner;
+
+class Main {
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int pilihan;
+
+        do {
+            System.out.println("Pilih jenis pengguna:");
+            System.out.println("1. Admin");
+            System.out.println("2. Mahasiswa");
+            System.out.println("3. Keluar");
+            System.out.print("Pilihan Anda: ");
+            pilihan = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (pilihan) {
+                case 1:
+                    Admin admin = new Admin(scanner);
+                    admin.menuAdmin();
+                    break;
+                case 2:
+                    Mahasiswa mahasiswa = new Mahasiswa(scanner);
+                    mahasiswa.menuMahasiswa();
+                    break;
+                case 3:
+                    System.out.println("Terima kasih!");
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+                    break;
+            }
+        } while (pilihan != 3);
+
+        scanner.close();
+    }
+}
+
+class Buku {
+    private String id;
+    private String judul;
+    private String pencipta;
+    private int stok;
+
+    public Buku(String id, String judul, String pencipta, int stok) {
+        this.id = id;
+        this.judul = judul;
+        this.pencipta = pencipta;
+        this.stok = stok;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getJudul() {
+        return judul;
+    }
+
+    public String getPencipta() {
+        return pencipta;
+    }
+
+    public int getStok() {
+        return stok;
+    }
+
+    // Method untuk mengurangi stok buku
+    public void setStok(int stok) {
+        this.stok = stok;
+    }
+}
 
 class Mahasiswa {
-    private String nim;
+    private Scanner scanner;
+
     private String nama;
-    private String jurusan;
+    private String fakultas;
+    private String programStudi;
+    private String nim;  // Tambahkan atribut nim
 
+    // Menambahkan beberapa contoh buku
+    private ArrayList<Buku> daftarBuku = new ArrayList<>();
 
-    public Mahasiswa(String nim, String nama, String jurusan) {
-        this.nama = nama;
-        this.nim = nim;
-        this.jurusan = jurusan;
+    public Mahasiswa(Scanner scanner) {
+        this.scanner = scanner;
+
+        // Menambahkan beberapa contoh buku
+        Buku buku1 = new Buku("001", "Java Programming", "Faruzan", 10);
+        Buku buku2 = new Buku("002", "Data Structures and Algorithms", "Alhaitham", 5);
+        Buku buku3 = new Buku("003", "Introduction to Artificial Intelligence", "Kaveh", 8);
+
+        daftarBuku.add(buku1);
+        daftarBuku.add(buku2);
+        daftarBuku.add(buku3);
     }
 
+    // Tambahkan metode getNim
     public String getNim() {
         return nim;
+    }
+
+    // Metode untuk menampilkan daftar buku
+    public void tampilkanDaftarBuku() {
+        System.out.println("Daftar Buku:");
+        for (Buku buku : daftarBuku) {
+            System.out.println("ID: " + buku.getId());
+            System.out.println("Judul: " + buku.getJudul());
+            System.out.println("Pencipta: " + buku.getPencipta());
+            System.out.println("Stok: " + buku.getStok());
+            System.out.println();
+        }
+    }
+
+    // Method untuk meminjam buku
+    public void pinjamBuku() {
+        System.out.println("Masukkan ID Buku yang ingin dipinjam: ");
+        String idBuku = scanner.nextLine();
+
+        // Cari buku berdasarkan ID
+        Buku bukuDipinjam = null;
+        for (Buku buku : daftarBuku) {
+            if (buku.getId().equals(idBuku)) {
+                bukuDipinjam = buku;
+                break;
+            }
+        }
+
+        if (bukuDipinjam != null) {
+            if (bukuDipinjam.getStok() > 0) {
+                // Kurangi stok buku
+                bukuDipinjam.setStok(bukuDipinjam.getStok() - 1);
+                System.out.println("Buku berhasil dipinjam.");
+            } else {
+                System.out.println("Maaf, stok buku tidak mencukupi.");
+            }
+        } else {
+            System.out.println("Buku tidak ditemukan.");
+        }
+    }
+
+    public void logout() {
+        System.out.println("Logout berhasil.");
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public void setFakultas(String fakultas) {
+        this.fakultas = fakultas;
+    }
+
+    public void setProgramStudi(String programStudi) {
+        this.programStudi = programStudi;
+    }
+
+    public void setNim(String nim) {
+        this.nim = nim;
     }
 
     public String getNama() {
         return nama;
     }
 
-    public String getJurusan() {
-        return jurusan;
+    public String getFakultas() {
+        return fakultas;
     }
 
-    public void tampilDataMahasiswa() {
-        System.out.println("Nama: " + nama);
-        System.out.println("NIM: " + nim);
-        System.out.println("Jurusan: " + jurusan);
+    public String getProgramStudi() {
+        return programStudi;
     }
 
-    public static void tampilUniversitas() {
-        System.out.println("Universitas Muhammadiyah Malang");
+    public void menuMahasiswa() {
+        int pilihanMahasiswa;
+        do {
+            System.out.println("Menu Mahasiswa:");
+            System.out.println("1. Lihat Daftar Buku");
+            System.out.println("2. Pinjam Buku");
+            System.out.println("3. Logout");
+            System.out.print("Pilihan Anda: ");
+            pilihanMahasiswa = scanner.nextInt();
+            scanner.nextLine();
 
+            switch (pilihanMahasiswa) {
+                case 1:
+                    tampilkanDaftarBuku();
+                    break;
+                case 2:
+                    pinjamBuku();
+                    break;
+                case 3:
+                    logout();
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+                    break;
+            }
+        } while (pilihanMahasiswa != 3);
     }
 }
 
-public class Main {
-    public static <ArrayList, ArrayList> void main(String[] args) {
-        ArrayList<Mahasiswa> daftarMahasiswa = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
+class Admin {
+    private Scanner scanner;
+    private ArrayList<Mahasiswa> daftarMahasiswa = new ArrayList<>();
 
-        while (true) {
-            System.out.println("Menu:");
-            System.out.println("1. Tambah Data Mahasiswa");
-            System.out.println("2. Tampilkan Data Mahasiswa");
-            System.out.println("3. Exit");
+    public Admin(Scanner scanner) {
+        this.scanner = scanner;
+
+        // Menambahkan beberapa mahasiswa contoh
+        Mahasiswa mahasiswa1 = new Mahasiswa(scanner);
+        mahasiswa1.setNama("Kazuha");
+        mahasiswa1.setNim("202310370311999");
+        mahasiswa1.setFakultas("Teknik");
+        mahasiswa1.setProgramStudi("Informatika");
+        daftarMahasiswa.add(mahasiswa1);
+
+        Mahasiswa mahasiswa2 = new Mahasiswa(scanner);
+        mahasiswa2.setNama("Kunikuzushi");
+        mahasiswa2.setNim("202310370311888");
+        mahasiswa2.setFakultas("Seni dan Rupa");
+        mahasiswa2.setProgramStudi("DKV");
+        daftarMahasiswa.add(mahasiswa2);
+    }
+
+    public void menuAdmin() {
+        int pilihanAdmin;
+        do {
+            System.out.println("Menu Admin:");
+            System.out.println("1. Tambah Mahasiswa");
+            System.out.println("2. Lihat Daftar Mahasiswa");
+            System.out.println("3. Logout");
             System.out.print("Pilihan Anda: ");
-            int pilihan = scanner.nextInt();
+            pilihanAdmin = scanner.nextInt();
+            scanner.nextLine();
 
-            switch (pilihan) {
+            switch (pilihanAdmin) {
                 case 1:
-                    System.out.print("Masukkan Nama: ");
-                    scanner.nextLine();
-                    String nama = scanner.nextLine();
-
-                    String nim;
-                    do {
-                        System.out.print("Masukkan NIM: ");
-                        nim = scanner.next();
-                        if (nim.length() != 15) {
-                            System.out.println("Panjang NIM harus 15 Digit. Coba lagi.");
-                        }
-                    } while (nim.length() != 15);
-
-                    System.out.print("Masukkan Jurusan: ");
-                    scanner.nextLine();
-                    String jurusan = scanner.nextLine();
-
-
-                    daftarMahasiswa.add(new Mahasiswa(nim, nama, jurusan));
-                    System.out.println("Data mahasiswa berhasil ditambahkan.");
+                    tambahMahasiswa();
                     break;
                 case 2:
-                    System.out.println("Data Mahasiswa:");
-                    Mahasiswa.tampilUniversitas();
-                    for (Mahasiswa mahasiswa : daftarMahasiswa) {
-                        mahasiswa.tampilDataMahasiswa();
-                        System.out.println();
-                    }
-
+                    tampilkanMahasiswa();
                     break;
                 case 3:
-                    System.out.println("Sangkyu!");
-                    scanner.close(); //
-                    System.exit(0);
+                    System.out.println("Logout berhasil.");
+                    break;
                 default:
-                    System.out.println("Pilihan tidak valdi Silakan pilih kembali.");
+                    System.out.println("Pilihan tidak valid.");
+                    break;
             }
+        } while (pilihanAdmin != 3);
+    }
+
+    private void tambahMahasiswa() {
+        System.out.println("Masukkan Nama Mahasiswa: ");
+        String nama = scanner.nextLine();
+        System.out.println("Masukkan NIM Mahasiswa (harus 15 karakter): ");
+        String nim = scanner.nextLine();
+        System.out.println("Masukkan Fakultas Mahasiswa: ");
+        String fakultas = scanner.nextLine();
+        System.out.println("Masukkan Program Studi Mahasiswa: ");
+        String programStudi = scanner.nextLine();
+
+        if (nim.length() == 15) {
+            Mahasiswa mahasiswa = new Mahasiswa(scanner);
+            mahasiswa.setNama(nama);
+            mahasiswa.setNim(nim);
+            mahasiswa.setFakultas(fakultas);
+            mahasiswa.setProgramStudi(programStudi);
+            daftarMahasiswa.add(mahasiswa);
+
+            System.out.println("Mahasiswa berhasil ditambahkan.");
+        } else {
+            System.out.println("Gagal menambahkan mahasiswa. Panjang NIM harus 15 karakter.");
+        }
+    }
+
+    private void tampilkanMahasiswa() {
+        System.out.println("Daftar Mahasiswa:");
+        for (Mahasiswa mahasiswa : daftarMahasiswa) {
+            System.out.println("Nama: " + mahasiswa.getNama());
+            System.out.println("NIM: " + mahasiswa.getNim());
+            System.out.println("Fakultas: " + mahasiswa.getFakultas());
+            System.out.println("Program Studi: " + mahasiswa.getProgramStudi());
+            System.out.println();
         }
     }
 }
